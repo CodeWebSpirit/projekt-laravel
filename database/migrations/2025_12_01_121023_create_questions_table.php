@@ -20,8 +20,8 @@ return new class extends Migration
 
             $table->text('text');
             $table->string('type')->default('single');
-
-            $table->json('options')->nullable();
+            $table->longText('options');
+            $table->longText('correct_answers')->nullable();
 
             $table->timestamps();
         });

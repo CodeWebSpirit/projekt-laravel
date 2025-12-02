@@ -14,10 +14,12 @@ class Question extends Model
         'text',
         'type',
         'options',
+        'correct_answer',
     ];
 
     protected $casts = [
-        'options' => 'array', // zapis/odczyt JSON jako tablica
+        'options' => 'array',
+        'correct_answers' => 'array',
     ];
 
     public function quiz()
