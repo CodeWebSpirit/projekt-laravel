@@ -1,18 +1,18 @@
 @extends('layouts.app')
 
-@section('title','Lista quizów')
-
 @section('content')
-    <h1>Lista quizów</h1>
+<h1>Lista dostępnych quizów</h1>
 
+@if($quizzes->isEmpty())
+    <p>Brak dostępnych quizów.</p>
+@else
     <ul>
-        @forelse($quizzes as $q)
+        @foreach($quizzes as $quiz)
             <li>
-                <a href="{{ route('quizzes.show', $q['id']) }}">{{ $q['title'] }}</a>
-                <p>{{ $q['description'] }}</p>
+                <a href="{{ route('quizzes.show', $quiz) }}">{{ $quiz->title }}</a>
+                <p>{{ $quiz->description }}</p>
             </li>
-        @empty
-            <li>Brak quizów.</li>
-        @endforelse
+        @endforeach
     </ul>
+@endif
 @endsection

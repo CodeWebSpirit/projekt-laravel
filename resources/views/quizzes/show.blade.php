@@ -1,28 +1,44 @@
 @extends('layouts.app')
 
-@section('title', $quiz['title'] ?? 'Quiz')
-
 @section('content')
-    <h1>{{ $quiz['title'] }}</h1>
-    <p>{{ $quiz['description'] }}</p>
+<h1>{{ $quiz->title }}</h1>
+<p>{{ $quiz->description }}</p>
 
+<form action="{{ route('quizzes.submit', $quiz) }}" method="POST">
+    @csrf
+
+    @foreach($quiz->questions as $question)
+        <div style="margin-bottom:20px;">
+            <p><strong>{{ $question->text }}</strong></p>
+
+@php
+    $oldAnswer = old('answers.' . $question->id);
+@endphp
+
+@foreach($question->options as $option)
     <div>
-        <h2>Pytania (Blade):</h2>
-        <ol>
-            @foreach($quiz['questions'] as $q)
-                <li>
-                    <strong>{{ $q['text'] }}</strong>
-                    <ul>
-                        @foreach($q['options'] as $opt)
-                            <li>{{ $opt }}</li>
-                        @endforeach
-                    </ul>
-                </li>
-            @endforeach
-        </ol>
+        <label>
+            <input 
+                type="{{ $question->type === 'multiple' ? 'checkbox' : 'radio' }}" 
+                name="answers[{{ $question->id }}]{{ $question->type === 'multiple' ? '[]' : '' }}" 
+                value="{{ $option }}"
+                @if($question->type === 'multiple')
+                    {{ (is_array($oldAnswer) && in_array($option, $oldAnswer)) ? 'checked' : '' }}
+                @else
+                    {{ ($oldAnswer === $option) ? 'checked' : '' }}
+                @endif
+            >
+            {{ $option }}
+        </label>
     </div>
+@endforeach
 
-    <hr>
+            @error('answers.' . $question->id)
+                <div style="color:red;">{{ $message }}</div>
+            @enderror
+        </div>
+    @endforeach
 
-    <div id="quiz-root" data-quiz='@json($quiz)'></div>
+    <button type="submit">Zakończ quiz</button>
+</form>
 @endsection

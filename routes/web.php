@@ -13,4 +13,5 @@ Route::get('/', function () {
 })->name('home');
 
 Route::get('/quizzes', [QuizController::class, 'index'])->name('quizzes.index');
-Route::get('/quizzes/{id}', [QuizController::class, 'show'])->name('quizzes.show');
+Route::get('/quizzes/{quiz}', [QuizController::class, 'show'])->name('quizzes.show');
+Route::post('/quizzes/{quiz}/submit', [QuizController::class, 'submit'])->name('quizzes.submit');
