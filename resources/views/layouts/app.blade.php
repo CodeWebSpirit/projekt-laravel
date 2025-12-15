@@ -17,7 +17,7 @@ body {
     margin: 0 auto;
     padding: 20px;
 }
-h1, h2, h3 {
+h1, h2, h3, p {
     font-weight: 700;
     margin-bottom: 15px;
     text-decoration: underline;
@@ -25,11 +25,45 @@ h1, h2, h3 {
     text-align: center;
 }
 header {
-    background-color: #ff8800; 
-    padding: 15px 0;
+    background-color: #ff8800;
+    padding: 10px 0;
     margin-bottom: 30px;
     box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-    text-align: center;
+}
+.header-container {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 0 20px;
+    display: flex;
+    justify-content: space-between; 
+    align-items: center; 
+}
+nav a {
+    color: white;
+    font-weight: bold;
+    margin: 0 5px;
+}
+.login-inline {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+.login-inline label {
+    display: none; 
+}
+.login-inline input {
+    padding: 5px;
+    border-radius: 4px;
+    border: 1px solid #ccc;
+    font-size: 14px;
+    width: 140px; 
+}
+.btn-sm {
+    padding: 5px 12px;
+    font-size: 14px;
+}
+nav a {
+    color: #fff !important;
 }
 a {
     text-decoration: none;
@@ -102,16 +136,49 @@ label {
         padding: 12px 0;
     }
 }
+.float-right {
+    float: right;
+}
 
 </style>
 </head>
 <body>
     <header>
+    <div class="header-container">
         <nav>
             <a href="{{ route('home') }}">Home</a> |
             <a href="{{ route('quizzes.index') }}">Quizy</a>
+            @if(Auth::check() && Auth::user()->is_admin)
+                | <a href="{{ route('admin.quizzes.index') }}">Panel Admina</a>
+            @endif
         </nav>
-    </header>
+        @if($errors->any())
+        <div style="color:red;>
+        <ul>
+            @foreach($errors->all() as $error)
+                <li>{{ $error }}</li>
+            @endforeach
+        </ul>
+        </div>
+        @endif
+        <div class="auth-bar">
+            @if(Auth::check())
+                <form method="POST" action="{{ route('logout') }}" style="margin: 0;">
+                    @csrf
+                    <span>Witaj, {{ Auth::user()->name }}</span>
+                    <button type="submit" class="btn-sm">Wyloguj</button>
+                </form>
+            @else
+                <form method="POST" action="{{ route('login') }}" class="login-inline">
+                    @csrf
+                    <input type="email" name="email" placeholder="Email" required>
+                    <input type="password" name="password" placeholder="Hasło" required>
+                    <button type="submit" class="btn-sm">Zaloguj</button>
+                </form>
+            @endif
+        </div>
+    </div>
+</header>
 
     <main>
        <div class="container">
