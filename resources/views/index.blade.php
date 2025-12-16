@@ -2,7 +2,6 @@
 @section('content')
 
 <h1>Witamy na stronie głównej!</h1>
-<p>Tu możesz przeglądać quizy lub zalogować się jako administrator.</p>
 
 
 @endsection
