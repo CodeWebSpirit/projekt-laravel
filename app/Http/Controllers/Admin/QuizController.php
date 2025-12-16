@@ -61,58 +61,64 @@ class QuizController extends Controller
     }
 
     public function update(Request $request, Quiz $quiz)
-    {
-        $data = $request->validate([
-            'title' => 'required|string|max:255',
-            'description' => 'required|string',
-            'questions' => 'nullable|array',
-            'questions.*.id' => 'nullable|integer',
-            'questions.*.text' => 'required|string',
-            'questions.*.type' => 'required|in:single,multiple',
-            'questions.*.options' => 'required|json',
-            'questions.*.correct_answers' => 'required|json',
-        ]);
+{
+    $data = $request->validate([
+        'title' => 'required|string|max:255',
+        'description' => 'required|string',
+        'questions' => 'nullable|array',
+        'questions.*.id' => 'nullable|integer',
+        'questions.*._delete' => 'nullable|boolean',
+        'questions.*.text' => 'required|string',
+        'questions.*.type' => 'required|in:single,multiple',
+        'questions.*.options' => 'required|json',
+        'questions.*.correct_answers' => 'required|json',
+    ]);
 
-        $quiz->update([
-            'title' => $data['title'],
-            'description' => $data['description'],
-        ]);
+    $quiz->update([
+        'title' => $data['title'],
+        'description' => $data['description'],
+    ]);
 
-        if (!empty($data['questions'])) {
-            foreach ($data['questions'] as $q) {
-                if (isset($q['id'])) {
-                    $question = $quiz->questions()->find($q['id']);
-                    if ($question) {
-                        $question->update([
-                            'text' => $q['text'],
-                            'type' => $q['type'],
-                            'options' => $q['options'] ? json_decode($q['options'], true) : [],
-                            'correct_answers' => $q['correct_answers'] ? json_decode($q['correct_answers'], true) : [],
-                        ]);
-                    }
-                } else {
-                    $quiz->questions()->create([
+    if (!empty($data['questions'])) {
+        foreach ($data['questions'] as $q) {
+
+            if (!empty($q['_delete']) && !empty($q['id'])) {
+                $quiz->questions()->where('id', $q['id'])->delete();
+                continue;
+            }
+
+            if (!empty($q['id'])) {
+                $question = $quiz->questions()->find($q['id']);
+                if ($question) {
+                    $question->update([
                         'text' => $q['text'],
                         'type' => $q['type'],
-                        'options' => $q['options'] ? json_decode($q['options'], true) : [],
-                        'correct_answers' => $q['correct_answers'] ? json_decode($q['correct_answers'], true) : [],
+                        'options' => json_decode($q['options'], true),
+                        'correct_answers' => json_decode($q['correct_answers'], true),
                     ]);
                 }
             }
+            else {
+                $quiz->questions()->create([
+                    'text' => $q['text'],
+                    'type' => $q['type'],
+                    'options' => json_decode($q['options'], true),
+                    'correct_answers' => json_decode($q['correct_answers'], true),
+                ]);
+            }
         }
-
-        return redirect()->route('admin.quizzes.index');
     }
+
+    return redirect()->route('admin.quizzes.index')
+        ->with('success', 'Quiz zapisany poprawnie');
+}
+
 
     public function destroy(Quiz $quiz)
     {
         $quiz->delete();
         return redirect()->route('admin.quizzes.index');
     }
-public function destroyQuestion(Question $question)
-{
-    $question->delete();
-    return redirect()->back()->with('success', 'Pytanie zostało usunięte.');
-}
+
 
 }
